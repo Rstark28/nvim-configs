@@ -200,46 +200,58 @@ require("lazy").setup({
   -- SYNTAX HIGHLIGHTING
   -- ============================================================================
   {
-  "nvim-treesitter/nvim-treesitter",
-  build = ":TSUpdate",
-  event = { "BufReadPre", "BufNewFile" },
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+    event = { "BufReadPre", "BufNewFile" },
 
-  dependencies = {
-    "nvim-treesitter/nvim-treesitter-textobjects",
-  },
-
-  opts = {
-    ensure_installed = { 
-      "lua", "vim", "vimdoc",
-      "python", 
-      "javascript", "typescript", 
-      "c", "cpp", 
-      "html", "css", 
-      "json", "yaml" 
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter-textobjects",
     },
 
-    auto_install = true,
-    sync_install = false,
+    opts = {
+      ensure_installed = { 
+        "lua", "vim", "vimdoc",
+        "python", 
+        "c", "cpp", 
+        "html", "css", 
+        "json", "yaml" 
+      },
 
-    highlight = { 
-      enable = true,
-      additional_vim_regex_highlighting = false,
-    },
+      auto_install = true,
+      sync_install = false,
 
-    indent = { 
-      enable = true 
-    },
+      highlight = { 
+        enable = true,
+        additional_vim_regex_highlighting = false,
+      },
 
-    incremental_selection = {
-      enable = true,
-      keymaps = {
-        init_selection = "<C-space>",
-        node_incremental = "<C-space>",
-        node_decremental = "<bs>",
+      indent = { 
+        enable = true 
+      },
+
+      incremental_selection = {
+        enable = true,
+        keymaps = {
+          init_selection = "<C-space>",
+          node_incremental = "<C-space>",
+          node_decremental = "<bs>",
+        },
       },
     },
   },
-}
+
+  -- ============================================================================
+  -- SMEAR CURSOR
+  -- ============================================================================
+  {
+    "sphamba/smear-cursor.nvim",
+    opts = {
+      smear_between_buffers = true,
+      smear_between_neighbor_lines = true,
+      legacy_computing_symbols_support = false,
+    },
+  },
+
 }, {
   -- Lazy.nvim configuration
   install = { colorscheme = { "tokyonight-night" } },
