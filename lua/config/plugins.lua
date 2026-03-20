@@ -252,6 +252,32 @@ require("lazy").setup({
     },
   },
 
+
+    -- ============================================================================
+    -- LATEX
+    -- ============================================================================
+{
+  "lervag/vimtex",
+  ft = "tex",
+  config = function()
+
+    vim.g.vimtex_compiler_method = "latexmk"
+    vim.g.vimtex_view_method = "skim"
+    
+    vim.g.vimtex_compiler_latexmk = {
+      options = { "-pdf", "-pvc", "-interaction=nonstopmode", "-synctex=1" }
+    }
+    
+    vim.g.vimtex_view_skim_sync = 1
+    vim.g.vimtex_view_skim_activate = 1
+    
+    vim.keymap.set("n", "<leader>ll", "<cmd>VimtexCompile<CR>", { desc = "Compile" })
+    vim.keymap.set("n", "<leader>lv", "<cmd>VimtexView<CR>", { desc = "View PDF" })
+    vim.keymap.set("n", "<leader>lk", "<cmd>VimtexStop<CR>", { desc = "Stop compile" })
+    
+  end,
+},
+
 }, {
   -- Lazy.nvim configuration
   install = { colorscheme = { "tokyonight-night" } },
