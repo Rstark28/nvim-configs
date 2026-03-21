@@ -21,11 +21,11 @@ keymap("n", "<C-l>", "<C-w>l", opts)  -- Move to right window
 keymap("n", "<C-d>", "<C-d>zz", opts)  -- Scroll down and center
 keymap("n", "<C-u>", "<C-u>zz", opts)  -- Scroll up and center
 
--- Window Resizing
-keymap("n", "<C-Up>", ":resize +2<CR>", opts)
-keymap("n", "<C-Down>", ":resize -2<CR>", opts)
-keymap("n", "<C-Left>", ":vertical resize -2<CR>", opts)
-keymap("n", "<C-Right>", ":vertical resize +2<CR>", opts)
+-- Window Resizing (use Alt+Arrows to avoid macOS Ctrl+Arrow conflicts)
+keymap("n", "<A-Up>", ":resize +2<CR>", opts)
+keymap("n", "<A-Down>", ":resize -2<CR>", opts)
+keymap("n", "<A-Right>", ":vertical resize -2<CR>", opts)
+keymap("n", "<A-Left>", ":vertical resize +2<CR>", opts)
 
 -- Buffer Navigation
 keymap("n", "<S-l>", ":bnext<CR>", opts)      -- Next buffer

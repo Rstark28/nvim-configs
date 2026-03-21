@@ -278,6 +278,121 @@ require("lazy").setup({
   end,
 },
 
+  -- ============================================================================
+  -- DAP (LLDB)
+  -- ============================================================================
+{
+  "mfussenegger/nvim-dap",
+  config = function()
+    local dap = require("dap")
+    
+    -- Configure LLDB debugger
+    local function find_codelldb()
+      local candidates = {
+        -- mason path
+        vim.fn.stdpath("data") .. "/mason/packages/codelldb/extension/adapter/codelldb",
+        -- common Homebrew paths
+        "/opt/homebrew/bin/codelldb",
+        "/usr/local/bin/codelldb",
+        "/usr/bin/codelldb",
+        -- fallback to PATH name
+        "codelldb",
+      }
+      for _, p in ipairs(candidates) do
+        if vim.loop.fs_stat(p) then
+          return p
+        end
+        if vim.fn.executable(p) == 1 then
+          return p
+        end
+      end
+      return nil
+    end
+
+    local codelldb_cmd = find_codelldb()
+    if codelldb_cmd then
+      dap.adapters.lldb = {
+        type = "server",
+        port = "${port}",
+        executable = {
+          command = codelldb_cmd,
+          args = { "--port", "${port}" },
+        },
+      }
+    else
+      -- Fallback to lldb-vscode if available, otherwise try lldb-vscode in PATH
+      local fallback = nil
+      if vim.fn.executable("lldb-vscode") == 1 then
+        fallback = "lldb-vscode"
+      elseif vim.fn.executable("lldb") == 1 then
+        fallback = "lldb"
+      end
+
+      if fallback then
+        dap.adapters.lldb = {
+          type = "server",
+          port = "${port}",
+          executable = {
+            command = fallback,
+            args = { "--port", "${port}" },
+          },
+        }
+      else
+        -- Last resort: use codelldb name and hope user installs it
+        dap.adapters.lldb = {
+          type = "server",
+          port = "${port}",
+          executable = {
+            command = "codelldb",
+            args = { "--port", "${port}" },
+          },
+        }
+      end
+    end
+    
+    -- Debug config for C/C++/Rust
+    dap.configurations.cpp = {
+      {
+        name = "Launch",
+        type = "lldb",
+        request = "launch",
+        program = function()
+          return vim.fn.input("Executable path: ", vim.fn.getcwd() .. "/")
+        end,
+        cwd = "${workspaceFolder}",
+        args = {}, 
+      },
+    }
+    
+    dap.configurations.c = dap.configurations.cpp
+    dap.configurations.rust = dap.configurations.cpp
+    
+    -- Quick keymaps
+    vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, { desc = "Toggle breakpoint" })
+    vim.keymap.set("n", "<leader>dc", dap.continue, { desc = "Start/Continue" })
+    vim.keymap.set("n", "<leader>do", dap.step_over, { desc = "Step over" })
+    vim.keymap.set("n", "<leader>di", dap.step_into, { desc = "Step into" })
+  end,
+},
+
+-- Debug UI (shows variables, stack, etc.)
+{
+  "rcarriga/nvim-dap-ui",
+  dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
+  config = function()
+    local dap, dapui = require("dap"), require("dapui")
+    dapui.setup()
+    
+    -- Auto-open UI when debugging starts, close when done
+    dap.listeners.after.event_initialized["dapui_config"] = dapui.open
+    dap.listeners.before.event_terminated["dapui_config"] = dapui.close
+    dap.listeners.before.event_exited["dapui_config"] = dapui.close
+    
+    -- Manual toggle with <leader>du
+    vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "Toggle debug UI" })
+  end,
+},
+
 }, {
   -- Lazy.nvim configuration
   install = { colorscheme = { "tokyonight-night" } },

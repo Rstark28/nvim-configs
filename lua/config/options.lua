@@ -15,60 +15,49 @@ local options = {
   undofile = true,       -- Enable persistent undo
   
   -- Visual settings
-  number = true,         -- Show line numbers
-  termguicolors = true,  -- Enable 24-bit colors
-  cursorline = false,    -- Don't highlight current line
-  wrap = false,          -- Don't wrap long lines
-  scrolloff = 4,         -- Keep 4 lines above/below cursor
-  sidescrolloff = 4,     -- Keep 4 columns left/right of cursor
-  signcolumn = "yes",    -- Always show sign column
+  number = true, 
+  termguicolors = true,
+  cursorline = false,
+  wrap = false,
+  scrolloff = 4,
+  sidescrolloff = 4,
+  signcolumn = "yes",
   
   -- Search settings
-  hlsearch = true,       -- Highlight search results
-  incsearch = true,      -- Show search matches as you type
-  ignorecase = true,     -- Ignore case in search
-  smartcase = true,      -- Use case-sensitive if capital letters
+  hlsearch = true,
+  incsearch = true,
+  ignorecase = true,
+  smartcase = true,
   
   -- Indentation
-  expandtab = true,      -- Use spaces instead of tabs
-  shiftwidth = 4,        -- Number of spaces for indentation
-  tabstop = 4,          -- Number of spaces for tab character
-  smartindent = true,    -- Smart auto-indenting
+  expandtab = true,
+  shiftwidth = 4,
+  tabstop = 4,
+  smartindent = true,
   
   -- Window behavior
-  splitbelow = true,     -- Open horizontal splits below
-  splitright = true,     -- Open vertical splits to the right
+  splitbelow = true,
+  splitright = true,
   
   -- Completion
-  completeopt = { "menuone", "noselect" },  -- Better completion
-  pumheight = 10,        -- Limit completion menu height
+  completeopt = { "menuone", "noselect" }, 
+  pumheight = 10,
   
   -- Interface
-  showmode = false,      -- Don't show mode (we have statusline)
-  cmdheight = 2,         -- Command line height
-  timeoutlen = 1000,     -- Time to wait for key sequences
-  updatetime = 300,      -- Faster completion
-  mouse = "a",           -- Enable mouse support
-  clipboard = "unnamedplus", -- Use system clipboard
+  showmode = false,
+  cmdheight = 2,
+  timeoutlen = 1000,
+  updatetime = 300,
+  mouse = "a",
+  clipboard = "unnamedplus",
 }
 
--- Apply all options
 for option, value in pairs(options) do
   vim.opt[option] = value
 end
 
 -- File-specific settings
 vim.api.nvim_create_augroup("FileTypeSettings", { clear = true })
-
--- Use 2 spaces for web development files
-vim.api.nvim_create_autocmd("FileType", {
-  group = "FileTypeSettings",
-  pattern = { "html", "css", "javascript", "typescript", "lua", "json", "yaml" },
-  callback = function()
-    vim.opt_local.shiftwidth = 2
-    vim.opt_local.tabstop = 2
-  end,
-})
 
 -- Disable auto-commenting on new lines
 vim.api.nvim_create_autocmd("BufEnter", {
