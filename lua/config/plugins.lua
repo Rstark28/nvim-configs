@@ -107,10 +107,9 @@ require("lazy").setup({
                     auto_trigger = true,
                     debounce = 75,
                     keymap = {
-                        accept = "<M-l>", -- Press Alt + L to accept ghost text
-                        next = "<M-]>",   -- Alt + ] for next suggestion
-                        prev = "<M-[>",   -- Alt + [ for previous suggestion
-                        dismiss = "<C-]>",-- Ctrl + ] to clear suggestion
+                        accept = "<C-l>",
+                        next = "<C-]",
+                        prev = "<M-[>",
                     },
                 },
                 panel = { enabled = false },
