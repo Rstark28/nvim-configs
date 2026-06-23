@@ -1,101 +1,59 @@
--- ============================================================================
--- Plugin Manager Setup - Using lazy.nvim
--- ============================================================================
-
--- Bootstrap lazy.nvim (install if not present)
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.uv.fs_stat(lazypath) then
-    local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-    vim.fn.system({ 
-        "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath 
-    })
+    vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable",
+        "https://github.com/folke/lazy.nvim.git", lazypath })
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Setup lazy.nvim
 require("lazy").setup({
-    -- ============================================================================
-    -- COLORSCHEME
-    -- ============================================================================
+
+    -- Colorscheme
     {
         "folke/tokyonight.nvim",
         lazy = false,
-        priority = 1000, 
+        priority = 1000,
         config = function()
             require("tokyonight").setup({
-                style = "night",
-                transparent = false,
-                terminal_colors = true,
-
+                style = "storm",
                 styles = {
                     comments = { italic = true },
                     keywords = { italic = true },
-                    functions = {},
-                    variables = {},
                 },
-
-                dim_inactive = false,
-
-                -- Custom color overrides
-                on_colors = function(colors)
-                    colors.error = "#FF6A00" -- Custom orange instead of red
-                end,
             })
-            vim.cmd([[colorscheme tokyonight-storm]])
+            vim.cmd.colorscheme("tokyonight-storm")
         end,
     },
 
-    -- ============================================================================
-    -- FILE TREE
-    -- ============================================================================
+    -- File tree
     {
         "nvim-tree/nvim-tree.lua",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
-            require("nvim-tree").setup({
-                view = {
-                    width = 30,
-                },
-            })
-            vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>")
+            require("nvim-tree").setup({ view = { width = 30 } })
+            vim.keymap.set("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", { silent = true })
         end,
     },
 
-    -- ============================================================================
-    -- FUZZY FINDER
-    -- ============================================================================
+    -- Fuzzy finder
     {
         "nvim-telescope/telescope.nvim",
         tag = "0.1.8",
         dependencies = { "nvim-lua/plenary.nvim" },
         config = function()
-            require('telescope').setup({})
-
-            local builtin = require('telescope.builtin')
-
-            -- File finder keymaps
-            vim.keymap.set("n", "<leader>ff", builtin.find_files, {})
-            vim.keymap.set("n", "<leader>fg", builtin.git_files, {})
-            vim.keymap.set("n", "<leader>fr", builtin.live_grep, {})
-            vim.keymap.set("n", "<leader>fb", builtin.buffers, {})
-            vim.keymap.set("n", "<leader>fh", function()
-                builtin.find_files({ hidden = true })
-            end)
+            require("telescope").setup({})
+            local b = require("telescope.builtin")
+            vim.keymap.set("n", "<leader>ff", b.find_files)
+            vim.keymap.set("n", "<leader>fg", b.git_files)
+            vim.keymap.set("n", "<leader>fr", b.live_grep)
+            vim.keymap.set("n", "<leader>fb", b.buffers)
+            vim.keymap.set("n", "<leader>fh", function() b.find_files({ hidden = true }) end)
         end,
     },
 
-    -- ============================================================================
-    -- AUTO PAIRS
-    -- ============================================================================
-    {
-        "altermo/ultimate-autopair.nvim",
-        event = { "InsertEnter" },
-        config = true,
-    },
+    -- Auto pairs
+    { "altermo/ultimate-autopair.nvim", event = "InsertEnter", config = true },
 
-    -- ============================================================================
-    -- GITHUB COPILOT 
-    -- ============================================================================
+    -- GitHub Copilot
     {
         "zbirenbaum/copilot.lua",
         cmd = "Copilot",
@@ -106,336 +64,210 @@ require("lazy").setup({
                     enabled = true,
                     auto_trigger = true,
                     debounce = 75,
-                    keymap = {
-                        accept = "<C-l>",
-                        next = "<C-]",
-                        prev = "<M-[>",
-                    },
+                    keymap = { accept = "<C-l>", next = "<C-]>", prev = "<M-[>" },
                 },
                 panel = { enabled = false },
             })
         end,
     },
 
-    -- ============================================================================
-    -- LSP & AUTOCOMPLETION
-    -- ============================================================================
+    -- LSP + completion
     {
         "neovim/nvim-lspconfig",
         dependencies = {
-            "williamboman/mason.nvim",           -- LSP installer
-            "williamboman/mason-lspconfig.nvim", -- Bridge between mason and lspconfig
-            "hrsh7th/nvim-cmp",                 -- Completion engine
-            "hrsh7th/cmp-nvim-lsp",             -- LSP completion source
-            "hrsh7th/cmp-buffer",               -- Buffer completion source
-            "hrsh7th/cmp-path",                 -- Path completion source
+            "williamboman/mason.nvim",
+            "williamboman/mason-lspconfig.nvim",
+            "hrsh7th/nvim-cmp",
+            "hrsh7th/cmp-nvim-lsp",
+            "hrsh7th/cmp-buffer",
+            "hrsh7th/cmp-path",
         },
-
         config = function()
-            -- LSP keymaps (activated when LSP attaches to buffer)
-            vim.api.nvim_create_autocmd('LspAttach', {
+            vim.api.nvim_create_autocmd("LspAttach", {
                 callback = function(event)
-                    local opts = { buffer = event.buf }
-
-                    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-                    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-                    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-                    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-                    vim.keymap.set('n', 'go', vim.lsp.buf.type_definition, opts)
-                    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-                    vim.keymap.set('n', '<leader>k', vim.diagnostic.open_float, opts)
-                    vim.keymap.set('n', '<F2>', vim.lsp.buf.rename, opts)
-                    vim.keymap.set('n', '<F4>', vim.lsp.buf.code_action, opts)
+                    local o = { buffer = event.buf }
+                    vim.keymap.set("n", "K",          vim.lsp.buf.hover,        o)
+                    vim.keymap.set("n", "gd",         vim.lsp.buf.definition,   o)
+                    vim.keymap.set("n", "gD",         vim.lsp.buf.declaration,  o)
+                    vim.keymap.set("n", "gi",         vim.lsp.buf.implementation, o)
+                    vim.keymap.set("n", "go",         vim.lsp.buf.type_definition, o)
+                    vim.keymap.set("n", "gr",         vim.lsp.buf.references,   o)
+                    vim.keymap.set("n", "<leader>k",  vim.diagnostic.open_float, o)
+                    vim.keymap.set("n", "<F2>",       vim.lsp.buf.rename,       o)
+                    vim.keymap.set("n", "<F4>",       vim.lsp.buf.code_action,  o)
                 end,
             })
 
-            -- Setup Mason (LSP installer)
             require("mason").setup()
 
-            -- Setup Mason-LSPConfig (manages LSP servers)
+            local caps = require("cmp_nvim_lsp").default_capabilities()
             require("mason-lspconfig").setup({
-                ensure_installed = {
-                    "lua_ls",        -- Lua
-                    "pyright",       -- Python
-                    "clangd",        -- C/C++
-                    "rust_analyzer", -- Rust
-                },
+                ensure_installed = { "lua_ls", "pyright", "clangd", "rust_analyzer" },
                 automatic_installation = true,
-
                 handlers = {
-                    -- Default handler for all servers
-                    function(server_name)
-                        require("lspconfig")[server_name].setup({
-                            capabilities = require("cmp_nvim_lsp").default_capabilities(),
+                    function(server)
+                        require("lspconfig")[server].setup({ capabilities = caps })
+                    end,
+                    lua_ls = function()
+                        require("lspconfig").lua_ls.setup({
+                            capabilities = caps,
+                            settings = { Lua = { diagnostics = { globals = { "vim" } } } },
                         })
                     end,
+                    rust_analyzer = function()
+                        require("lspconfig").rust_analyzer.setup({
+                            capabilities = caps,
+                            settings = {
+                                ["rust-analyzer"] = {
+                                    cargo = { allFeatures = true },
+                                    check = { command = "clippy" },
+                                },
+                            },
+                        })
+                    end,
+                },
+            })
 
-                    -- Special configuration for Lua LSP
-          lua_ls = function()
-              require("lspconfig").lua_ls.setup({
-                  capabilities = require("cmp_nvim_lsp").default_capabilities(),
-                  settings = {
-                      Lua = {
-                          diagnostics = {
-                              globals = { "vim" }, -- Recognize vim global
-                          },
-                      },
-                  },
-              })
-          end,
-          rust_analyzer = function()
-              require("lspconfig").rust_analyzer.setup({
-                  capabilities = require("cmp_nvim_lsp").default_capabilities(),
-                  settings = {
-                      ["rust-analyzer"] = {
-                          cargo = {
-                              allFeatures = true,
-                          },
-                          check = {
-                              command = "clippy",
-                          },
-                      },
-                  },
-              })
-          end,
-      },
-  })
-
-  -- Setup completion
-  local cmp = require("cmp")
-
-  cmp.setup({
-      sources = {
-          { name = "nvim_lsp" },
-          { name = "buffer" },
-          { name = "path" },
-      },
-
-      mapping = cmp.mapping.preset.insert({
-          ["<C-k>"] = cmp.mapping.select_prev_item(),
-          ["<C-j>"] = cmp.mapping.select_next_item(),
-          ["<C-Space>"] = cmp.mapping.complete(),
-          ["<C-e>"] = cmp.mapping.abort(),
-          ["<CR>"] = cmp.mapping.confirm({ select = false }),
-          ["<Tab>"] = cmp.mapping(function(fallback)
-              if cmp.visible() then
-                  cmp.select_next_item()
-              else
-                  fallback()
-              end
-          end, { "i", "s" }),
-          ["<S-Tab>"] = cmp.mapping(function(fallback)
-              if cmp.visible() then
-                  cmp.select_prev_item()
-              else
-                  fallback()
-              end
-          end, { "i", "s" }),
-      }),
-  })
-    end,
-},
-
--- ============================================================================
--- SYNTAX HIGHLIGHTING
--- ============================================================================
-{
-    "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdate",
-    event = { "BufReadPre", "BufNewFile" },
-
-    dependencies = {
-        "nvim-treesitter/nvim-treesitter-textobjects",
+            local cmp = require("cmp")
+            cmp.setup({
+                sources = {
+                    { name = "nvim_lsp" },
+                    { name = "buffer" },
+                    { name = "path" },
+                },
+                mapping = cmp.mapping.preset.insert({
+                    ["<C-k>"]     = cmp.mapping.select_prev_item(),
+                    ["<C-j>"]     = cmp.mapping.select_next_item(),
+                    ["<C-Space>"] = cmp.mapping.complete(),
+                    ["<C-e>"]     = cmp.mapping.abort(),
+                    ["<CR>"]      = cmp.mapping.confirm({ select = false }),
+                    ["<Tab>"] = cmp.mapping(function(fallback)
+                        if cmp.visible() then cmp.select_next_item() else fallback() end
+                    end, { "i", "s" }),
+                    ["<S-Tab>"] = cmp.mapping(function(fallback)
+                        if cmp.visible() then cmp.select_prev_item() else fallback() end
+                    end, { "i", "s" }),
+                }),
+            })
+        end,
     },
 
-    opts = {
-        ensure_installed = { 
-            "lua", "vim", "vimdoc",
-            "python", 
-            "c", "cpp", 
-            "html", "css", 
-            "json", "yaml",
-            "rust"
-        },
+    -- Syntax highlighting
+    {
+        "nvim-treesitter/nvim-treesitter",
+        branch = "master",
+        build = ":TSUpdate",
+        event = { "BufReadPre", "BufNewFile" },
+        dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
+        config = function()
+            require("nvim-treesitter.configs").setup({
+                ensure_installed = {
+                    "lua", "vim", "vimdoc",
+                    "python", "c", "cpp", "rust",
+                    "html", "css", "json", "yaml",
+                },
+                auto_install = true,
+                highlight = { enable = true, additional_vim_regex_highlighting = false },
+                indent = { enable = true },
+                incremental_selection = {
+                    enable = true,
+                    keymaps = {
+                        init_selection    = "<C-space>",
+                        node_incremental  = "<C-space>",
+                        node_decremental  = "<bs>",
+                    },
+                },
+            })
 
-        auto_install = true,
-        sync_install = false,
+        end,
+    },
 
-        highlight = { 
-            enable = true,
-            additional_vim_regex_highlighting = false,
-        },
-
-        indent = { 
-            enable = true 
-        },
-
-        incremental_selection = {
-            enable = true,
-            keymaps = {
-                init_selection = "<C-space>",
-                node_incremental = "<C-space>",
-                node_decremental = "<bs>",
-            },
+    -- Smear cursor
+    {
+        "sphamba/smear-cursor.nvim",
+        opts = {
+            smear_between_buffers = true,
+            smear_between_neighbor_lines = true,
+            legacy_computing_symbols_support = false,
         },
     },
-},
 
--- ============================================================================
--- SMEAR CURSOR
--- ============================================================================
-{
-    "sphamba/smear-cursor.nvim",
-    opts = {
-        smear_between_buffers = true,
-        smear_between_neighbor_lines = true,
-        legacy_computing_symbols_support = false,
-    },
-},
-
-
--- ============================================================================
--- LATEX
--- ============================================================================
-{
-    "lervag/vimtex",
-    ft = "tex",
-    config = function()
-
-        vim.g.vimtex_compiler_method = "latexmk"
-        vim.g.vimtex_view_method = "skim"
-
-        vim.g.vimtex_compiler_latexmk = {
-            options = { "-pdf", "-pvc", "-interaction=nonstopmode", "-synctex=1" }
-        }
-
-        vim.g.vimtex_view_skim_sync = 1
-        vim.g.vimtex_view_skim_activate = 1
-
-        vim.keymap.set("n", "<leader>ll", "<cmd>VimtexCompile<CR>", { desc = "Compile" })
-        vim.keymap.set("n", "<leader>lv", "<cmd>VimtexView<CR>", { desc = "View PDF" })
-        vim.keymap.set("n", "<leader>lk", "<cmd>VimtexStop<CR>", { desc = "Stop compile" })
-
-    end,
-},
-
--- ============================================================================
--- DAP (LLDB)
--- ============================================================================
-{
-    "mfussenegger/nvim-dap",
-    config = function()
-        local dap = require("dap")
-
-        -- Configure LLDB debugger
-        local function find_codelldb()
-            local candidates = {
-                -- mason path
-                vim.fn.stdpath("data") .. "/mason/packages/codelldb/extension/adapter/codelldb",
-                -- common Homebrew paths
-                "/opt/homebrew/bin/codelldb",
-                "/usr/local/bin/codelldb",
-                "/usr/bin/codelldb",
-                -- fallback to PATH name
-                "codelldb",
+    -- LaTeX
+    {
+        "lervag/vimtex",
+        ft = "tex",
+        config = function()
+            vim.g.vimtex_compiler_method = "latexmk"
+            vim.g.vimtex_view_method = "skim"
+            vim.g.vimtex_compiler_latexmk = {
+                options = { "-pdf", "-pvc", "-interaction=nonstopmode", "-synctex=1" }
             }
-            for _, p in ipairs(candidates) do
-                if vim.loop.fs_stat(p) then
-                    return p
-                end
-                if vim.fn.executable(p) == 1 then
-                    return p
-                end
-            end
-            return nil
-        end
+            vim.g.vimtex_view_skim_sync     = 1
+            vim.g.vimtex_view_skim_activate = 1
+            vim.keymap.set("n", "<leader>ll", "<cmd>VimtexCompile<CR>", { desc = "Compile" })
+            vim.keymap.set("n", "<leader>lv", "<cmd>VimtexView<CR>",    { desc = "View PDF" })
+            vim.keymap.set("n", "<leader>lk", "<cmd>VimtexStop<CR>",    { desc = "Stop compile" })
+        end,
+    },
 
-        local codelldb_cmd = find_codelldb()
-        if codelldb_cmd then
+    -- DAP debugger (LLDB via codelldb)
+    {
+        "mfussenegger/nvim-dap",
+        config = function()
+            local dap = require("dap")
+
+            local codelldb = (function()
+                for _, p in ipairs({
+                    vim.fn.stdpath("data") .. "/mason/packages/codelldb/extension/adapter/codelldb",
+                    "/opt/homebrew/bin/codelldb",
+                    "/usr/local/bin/codelldb",
+                    "codelldb",
+                }) do
+                    if vim.uv.fs_stat(p) or vim.fn.executable(p) == 1 then return p end
+                end
+            end)()
+
             dap.adapters.lldb = {
                 type = "server",
                 port = "${port}",
-                executable = {
-                    command = codelldb_cmd,
-                    args = { "--port", "${port}" },
-                },
+                executable = { command = codelldb or "codelldb", args = { "--port", "${port}" } },
             }
-        else
-            -- Fallback to lldb-vscode if available, otherwise try lldb-vscode in PATH
-            local fallback = nil
-            if vim.fn.executable("lldb-vscode") == 1 then
-                fallback = "lldb-vscode"
-            elseif vim.fn.executable("lldb") == 1 then
-                fallback = "lldb"
-            end
 
-            if fallback then
-                dap.adapters.lldb = {
-                    type = "server",
-                    port = "${port}",
-                    executable = {
-                        command = fallback,
-                        args = { "--port", "${port}" },
-                    },
-                }
-            else
-                -- Last resort: use codelldb name and hope user installs it
-                dap.adapters.lldb = {
-                    type = "server",
-                    port = "${port}",
-                    executable = {
-                        command = "codelldb",
-                        args = { "--port", "${port}" },
-                    },
-                }
-            end
-        end
-
-        -- Debug config for C/C++/Rust
-        dap.configurations.cpp = {
-            {
-                name = "Launch",
-                type = "lldb",
+            dap.configurations.cpp = {{
+                name    = "Launch",
+                type    = "lldb",
                 request = "launch",
                 program = function()
                     return vim.fn.input("Executable path: ", vim.fn.getcwd() .. "/")
                 end,
-                cwd = "${workspaceFolder}",
-                args = {}, 
-            },
-        }
+                cwd  = "${workspaceFolder}",
+                args = {},
+            }}
+            dap.configurations.c    = dap.configurations.cpp
+            dap.configurations.rust = dap.configurations.cpp
 
-        dap.configurations.c = dap.configurations.cpp
-        dap.configurations.rust = dap.configurations.cpp
+            vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, { desc = "Toggle breakpoint" })
+            vim.keymap.set("n", "<leader>dc", dap.continue,          { desc = "Start/Continue" })
+            vim.keymap.set("n", "<leader>do", dap.step_over,         { desc = "Step over" })
+            vim.keymap.set("n", "<leader>di", dap.step_into,         { desc = "Step into" })
+        end,
+    },
 
-        -- Quick keymaps
-        vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, { desc = "Toggle breakpoint" })
-        vim.keymap.set("n", "<leader>dc", dap.continue, { desc = "Start/Continue" })
-        vim.keymap.set("n", "<leader>do", dap.step_over, { desc = "Step over" })
-        vim.keymap.set("n", "<leader>di", dap.step_into, { desc = "Step into" })
-    end,
-},
-
--- Debug UI (shows variables, stack, etc.)
-{
-    "rcarriga/nvim-dap-ui",
-    dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
-    config = function()
-        local dap, dapui = require("dap"), require("dapui")
-        dapui.setup()
-
-        -- Auto-open UI when debugging starts, close when done
-        dap.listeners.after.event_initialized["dapui_config"] = dapui.open
-        dap.listeners.before.event_terminated["dapui_config"] = dapui.close
-        dap.listeners.before.event_exited["dapui_config"] = dapui.close
-
-        -- Manual toggle with <leader>du
-        vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "Toggle debug UI" })
-    end,
-},
+    -- DAP UI
+    {
+        "rcarriga/nvim-dap-ui",
+        dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
+        config = function()
+            local dap, dapui = require("dap"), require("dapui")
+            dapui.setup()
+            dap.listeners.after.event_initialized["dapui_config"] = dapui.open
+            dap.listeners.before.event_terminated["dapui_config"] = dapui.close
+            dap.listeners.before.event_exited["dapui_config"]     = dapui.close
+            vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "Toggle debug UI" })
+        end,
+    },
 
 }, {
-    -- Lazy.nvim configuration
-    install = { colorscheme = { "tokyonight-night" } },
-    checker = { enabled = true }, -- Check for plugin updates
+    install = { colorscheme = { "tokyonight-storm" } },
+    checker  = { enabled = true },
 })

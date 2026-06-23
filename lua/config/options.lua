@@ -56,15 +56,18 @@ for option, value in pairs(options) do
   vim.opt[option] = value
 end
 
--- File-specific settings
-vim.api.nvim_create_augroup("FileTypeSettings", { clear = true })
-
 -- Disable auto-commenting on new lines
+local format_group = vim.api.nvim_create_augroup("FileTypeSettings", { clear = true })
 vim.api.nvim_create_autocmd("BufEnter", {
+  group = format_group,
   callback = function()
     vim.opt.formatoptions:remove({ "c", "r", "o" })
   end,
 })
+
+-- Metal shading language
+vim.filetype.add({ extension = { metal = "metal" } })
+vim.treesitter.language.register("cpp", "metal")
 
 -- Highlight on yank
 vim.api.nvim_create_autocmd("TextYankPost", {
