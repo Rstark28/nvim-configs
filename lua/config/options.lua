@@ -1,7 +1,3 @@
--- ============================================================================
--- Editor Options - Basic Neovim settings
--- ============================================================================
-
 -- Set leader key to space (must be set before plugins)
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "

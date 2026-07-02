@@ -267,7 +267,7 @@ require("lazy").setup({
         end,
     },
 
-    -- Git diff viewer
+    -- Git diff view
     {
         "sindrets/diffview.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
