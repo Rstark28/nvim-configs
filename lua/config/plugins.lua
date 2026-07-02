@@ -164,7 +164,7 @@ require("lazy").setup({
                 ensure_installed = {
                     "lua", "vim", "vimdoc",
                     "python", "c", "cpp", "rust",
-                    "html", "css", "json", "yaml",
+                    "html", "css", "json", "yaml", "javascript"
                 },
                 auto_install = true,
                 highlight = { enable = true, additional_vim_regex_highlighting = false },
@@ -264,6 +264,21 @@ require("lazy").setup({
             dap.listeners.before.event_terminated["dapui_config"] = dapui.close
             dap.listeners.before.event_exited["dapui_config"]     = dapui.close
             vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "Toggle debug UI" })
+        end,
+    },
+
+    -- Git diff viewer
+    {
+        "sindrets/diffview.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewFileHistory", "DiffviewToggleFiles", "DiffviewFocusFiles" },
+        keys = {
+            { "<leader>gd", "<cmd>DiffviewOpen<CR>", desc = "Open diffview" },
+            { "<leader>gh", "<cmd>DiffviewFileHistory<CR>", desc = "File history" },
+            { "<leader>gc", "<cmd>DiffviewClose<CR>", desc = "Close diffview" },
+        },
+        config = function()
+            require("diffview").setup({})
         end,
     },
 
