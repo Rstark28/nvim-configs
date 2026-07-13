@@ -64,7 +64,7 @@ require("lazy").setup({
                     enabled = true,
                     auto_trigger = true,
                     debounce = 75,
-                    keymap = { accept = "<C-l>", next = "<C-]>", prev = "<M-[>" },
+                    keymap = { accept = "<C-l>", next = "<M-]>", prev = "<M-[>" },
                 },
                 panel = { enabled = false },
             })
