@@ -102,7 +102,7 @@ require("lazy").setup({
 
             local caps = require("cmp_nvim_lsp").default_capabilities()
             require("mason-lspconfig").setup({
-                ensure_installed = { "lua_ls", "pyright", "clangd", "rust_analyzer" },
+                ensure_installed = { "lua_ls", "pyright", "clangd", "rust_analyzer", "matlab_ls" },
                 automatic_installation = true,
                 handlers = {
                     function(server)
@@ -164,7 +164,8 @@ require("lazy").setup({
                 ensure_installed = {
                     "lua", "vim", "vimdoc",
                     "python", "c", "cpp", "rust",
-                    "html", "css", "json", "yaml", "javascript"
+                    "html", "css", "json", "yaml",
+                    "javascript"
                 },
                 auto_install = true,
                 highlight = { enable = true, additional_vim_regex_highlighting = false },
@@ -190,24 +191,6 @@ require("lazy").setup({
             smear_between_neighbor_lines = true,
             legacy_computing_symbols_support = false,
         },
-    },
-
-    -- LaTeX
-    {
-        "lervag/vimtex",
-        ft = "tex",
-        config = function()
-            vim.g.vimtex_compiler_method = "latexmk"
-            vim.g.vimtex_view_method = "skim"
-            vim.g.vimtex_compiler_latexmk = {
-                options = { "-pdf", "-pvc", "-interaction=nonstopmode", "-synctex=1" }
-            }
-            vim.g.vimtex_view_skim_sync     = 1
-            vim.g.vimtex_view_skim_activate = 1
-            vim.keymap.set("n", "<leader>ll", "<cmd>VimtexCompile<CR>", { desc = "Compile" })
-            vim.keymap.set("n", "<leader>lv", "<cmd>VimtexView<CR>",    { desc = "View PDF" })
-            vim.keymap.set("n", "<leader>lk", "<cmd>VimtexStop<CR>",    { desc = "Stop compile" })
-        end,
     },
 
     -- DAP debugger (LLDB via codelldb)
