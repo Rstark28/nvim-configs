@@ -102,7 +102,7 @@ require("lazy").setup({
 
             local caps = require("cmp_nvim_lsp").default_capabilities()
             require("mason-lspconfig").setup({
-                ensure_installed = { "lua_ls", "pyright", "clangd", "rust_analyzer", "matlab_ls" },
+                ensure_installed = { "lua_ls", "clangd", "rust_analyzer"},
                 automatic_installation = true,
                 handlers = {
                     function(server)
@@ -191,6 +191,17 @@ require("lazy").setup({
             smear_between_neighbor_lines = true,
             legacy_computing_symbols_support = false,
         },
+    },
+
+    -- RSVP speed reader
+    {
+        "shardulvs/speedread.nvim",
+        cmd = { "Speedread", "SpeedreadStop" },
+        keys = {
+            { "<leader>sr", "<cmd>Speedread<CR>", mode = { "n", "x" }, desc = "Speed read" },
+            { "<leader>sc", "<cmd>SpeedreadStop<CR>", desc = "Stop speed reader" },
+        },
+        opts = {},
     },
 
     -- DAP debugger (LLDB via codelldb)

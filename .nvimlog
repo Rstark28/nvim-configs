@@ -1,0 +1,4 @@
+WRN 2026-09-24T09:52:39.510 ?.25953    server_start:199: Failed to start server: operation not permitted: /var/folders/15/59dglw6x1ksd8cnfng_gcjg80000gn/T/nvim.robertstark/R2gMmB/nvim.25953.0
+WRN 2026-09-24T09:52:39.608 ?.25949    server_start:199: Failed to start server: operation not permitted: /var/folders/15/59dglw6x1ksd8cnfng_gcjg80000gn/T/nvim.robertstark/DLB49C/nvim.25949.0
+WRN 2026-09-24T10:10:25.563 ?.29209    server_start:199: Failed to start server: operation not permitted: /var/folders/15/59dglw6x1ksd8cnfng_gcjg80000gn/T/nvim.robertstark/dpBgKn/nvim.29209.0
+WRN 2026-09-24T10:10:37.911 ui.29208   tui_stop:654: TUI: timed out waiting for DA1 response
