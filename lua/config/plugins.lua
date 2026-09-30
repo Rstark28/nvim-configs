@@ -158,7 +158,6 @@ require("lazy").setup({
         branch = "master",
         build = ":TSUpdate",
         event = { "BufReadPre", "BufNewFile" },
-        dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
         config = function()
             require("nvim-treesitter.configs").setup({
                 ensure_installed = {
@@ -191,74 +190,6 @@ require("lazy").setup({
             smear_between_neighbor_lines = true,
             legacy_computing_symbols_support = false,
         },
-    },
-
-    -- RSVP speed reader
-    {
-        "shardulvs/speedread.nvim",
-        cmd = { "Speedread", "SpeedreadStop" },
-        keys = {
-            { "<leader>sr", "<cmd>Speedread<CR>", mode = { "n", "x" }, desc = "Speed read" },
-            { "<leader>sc", "<cmd>SpeedreadStop<CR>", desc = "Stop speed reader" },
-        },
-        opts = {},
-    },
-
-    -- DAP debugger (LLDB via codelldb)
-    {
-        "mfussenegger/nvim-dap",
-        config = function()
-            local dap = require("dap")
-
-            local codelldb = (function()
-                for _, p in ipairs({
-                    vim.fn.stdpath("data") .. "/mason/packages/codelldb/extension/adapter/codelldb",
-                    "/opt/homebrew/bin/codelldb",
-                    "/usr/local/bin/codelldb",
-                    "codelldb",
-                }) do
-                    if vim.uv.fs_stat(p) or vim.fn.executable(p) == 1 then return p end
-                end
-            end)()
-
-            dap.adapters.lldb = {
-                type = "server",
-                port = "${port}",
-                executable = { command = codelldb or "codelldb", args = { "--port", "${port}" } },
-            }
-
-            dap.configurations.cpp = {{
-                name    = "Launch",
-                type    = "lldb",
-                request = "launch",
-                program = function()
-                    return vim.fn.input("Executable path: ", vim.fn.getcwd() .. "/")
-                end,
-                cwd  = "${workspaceFolder}",
-                args = {},
-            }}
-            dap.configurations.c    = dap.configurations.cpp
-            dap.configurations.rust = dap.configurations.cpp
-
-            vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, { desc = "Toggle breakpoint" })
-            vim.keymap.set("n", "<leader>dc", dap.continue,          { desc = "Start/Continue" })
-            vim.keymap.set("n", "<leader>do", dap.step_over,         { desc = "Step over" })
-            vim.keymap.set("n", "<leader>di", dap.step_into,         { desc = "Step into" })
-        end,
-    },
-
-    -- DAP UI
-    {
-        "rcarriga/nvim-dap-ui",
-        dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
-        config = function()
-            local dap, dapui = require("dap"), require("dapui")
-            dapui.setup()
-            dap.listeners.after.event_initialized["dapui_config"] = dapui.open
-            dap.listeners.before.event_terminated["dapui_config"] = dapui.close
-            dap.listeners.before.event_exited["dapui_config"]     = dapui.close
-            vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "Toggle debug UI" })
-        end,
     },
 
     -- Git diff view
